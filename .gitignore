@@ -4,6 +4,8 @@
 dist/
 node_modules/
 *.local
+.env
+.env.*
 
 # Logs & Coverage
 coverage/
