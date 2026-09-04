@@ -4,6 +4,16 @@
   "description": "API debugging inside DevTools. Zero permissions. Local-first. Secrets redacted by default.",
   "private": true,
   "type": "module",
+  "author": "malilion",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/malilion/devtrace-lion.git"
+  },
+  "bugs": {
+    "url": "https://github.com/malilion/devtrace-lion/issues"
+  },
+  "homepage": "https://github.com/malilion/devtrace-lion#readme",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",
