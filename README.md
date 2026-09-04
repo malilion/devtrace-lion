@@ -47,6 +47,52 @@ Modern browser DevTools Network panels are cluttered with hundreds of static ass
 
 ---
 
+## 🎯 Purpose & Real-World Use Cases (Problems Solved)
+
+In day-to-day software development, frontend engineers, backend developers, QA testers, and security teams constantly inspect HTTP API calls. **DevTrace Lion was engineered to solve these 7 specific developer pain points:**
+
+```
+┌────────────────────────────────────┬────────────────────────────────────────────────────────────┐
+│ Developer Pain Point               │ DevTrace Lion's Purpose & Solution                         │
+├────────────────────────────────────┼────────────────────────────────────────────────────────────┤
+│ 1. Network panel noise & clutter   │ API Isolation: Isolates Fetch/XHR with zero asset noise   │
+│ 2. Accidental token/secret leaks   │ Pre-Store Redaction: 100% safe clipboard copy & export     │
+│ 3. Polyglot bug reproduction       │ 8 Code Generators: cURL, C#, Python, Go, PHP, Axios, etc.  │
+│ 4. API regression & schema drift   │ Built-in JSON Diff: Instant added/removed/modified view   │
+│ 5. Ambiguous HTTP error codes      │ Rule-Based Insights: Diagnose 401s, 429 delays, 500 HTML   │
+│ 6. Sharing sensitive HAR bug logs  │ Sanitized Bundles: Export de-identified debug logs         │
+│ 7. Strict corporate IT policies    │ Zero Permissions: Manifest has permissions: [], zero risk  │
+└────────────────────────────────────┴────────────────────────────────────────────────────────────┘
+```
+
+### Typical Developer Scenarios:
+
+1. **🚀 API Integration & Debugging (Noise Elimination)**
+   - **Problem**: Opening a web app triggers 300+ requests (images, CSS, tracking scripts). Finding your `/api/cart/checkout` call is exhausting.
+   - **Purpose**: DevTrace Lion ignores static assets and tracks only Fetch/XHR requests with instant fuzzy search and status grouping.
+
+2. **🛡️ Safe Team Sharing (Zero Token Leaks)**
+   - **Problem**: When asking a backend colleague *"Why is this endpoint failing?"*, pasting a raw cURL command into Slack or GitHub Issues often leaks your personal `Authorization: Bearer <JWT>` or session cookies.
+   - **Purpose**: DevTrace Lion masks sensitive tokens as `•••••••••••` before storing them. Anything you copy or export is safe by default.
+
+3. **🔁 Polyglot Bug Reproduction**
+   - **Problem**: Frontend files an issue, and the backend engineer asks: *"Can you give me a Python/C#/Go snippet to test this locally?"*
+   - **Purpose**: Switch to the **Code Gen** tab and copy idiomatic code in 8 languages with one click.
+
+4. **⚖️ API Schema Diff & Regression Testing**
+   - **Problem**: Backend refactors an endpoint and says: *"It's completely backward compatible."* How do you verify without writing custom scripts?
+   - **Purpose**: Use **"⚡ Diff"** to pick Request A and Request B. DevTrace Lion highlights added fields in green, removed fields in red, and modified values in yellow.
+
+5. **💡 Instant Diagnostic Advice**
+   - **Problem**: Receiving 401: Did the client omit the header or did the token expire? Receiving 429: How many seconds should the client back off? Receiving 500: Did the server return JSON or a default Nginx crash HTML?
+   - **Purpose**: Built-in, zero-latency diagnostic rules inspect headers and bodies to suggest immediate next steps.
+
+6. **💼 Enterprise & High-Security Compliance**
+   - **Problem**: Strict IT environments prohibit browser extensions requesting `<all_urls>` or reading browsing histories.
+   - **Purpose**: DevTrace Lion declares **zero permissions**, processes data entirely in RAM, and discards all records when DevTools closes.
+
+---
+
 ## 🚀 Quick Start
 
 ### 1. Installation
