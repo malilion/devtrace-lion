@@ -1,0 +1,36 @@
+{
+  "startedDateTime": "2026-09-04T12:04:00.000Z",
+  "time": 45.2,
+  "request": {
+    "method": "GET",
+    "url": "https://api.example.com/v1/search?q=lion",
+    "headers": [
+      { "name": "Accept", "value": "application/json" }
+    ],
+    "headersSize": 180,
+    "bodySize": 0
+  },
+  "response": {
+    "status": 429,
+    "statusText": "Too Many Requests",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" },
+      { "name": "Retry-After", "value": "60" },
+      { "name": "X-RateLimit-Limit", "value": "100" },
+      { "name": "X-RateLimit-Remaining", "value": "0" }
+    ],
+    "content": {
+      "size": 65,
+      "mimeType": "application/json",
+      "text": "{\"error\":\"rate_limit_exceeded\",\"message\":\"Too many requests\"}"
+    },
+    "headersSize": 240,
+    "bodySize": 65
+  },
+  "timings": {
+    "send": 1.0,
+    "wait": 42.0,
+    "receive": 2.2
+  },
+  "_resourceType": "fetch"
+}

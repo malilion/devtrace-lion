@@ -1,0 +1,35 @@
+{
+  "startedDateTime": "2026-09-04T12:06:00.000Z",
+  "time": 75.0,
+  "request": {
+    "method": "GET",
+    "url": "https://api.example.com/assets/logo.png",
+    "headers": [
+      { "name": "Accept", "value": "image/png,image/*" }
+    ],
+    "headersSize": 150,
+    "bodySize": 0
+  },
+  "response": {
+    "status": 200,
+    "statusText": "OK",
+    "headers": [
+      { "name": "Content-Type", "value": "image/png" },
+      { "name": "Content-Length", "value": "68" }
+    ],
+    "content": {
+      "size": 68,
+      "mimeType": "image/png",
+      "encoding": "base64",
+      "text": "iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg=="
+    },
+    "headersSize": 120,
+    "bodySize": 68
+  },
+  "timings": {
+    "send": 1.0,
+    "wait": 60.0,
+    "receive": 14.0
+  },
+  "_resourceType": "fetch"
+}

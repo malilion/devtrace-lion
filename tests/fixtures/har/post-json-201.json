@@ -1,0 +1,45 @@
+{
+  "startedDateTime": "2026-09-04T12:01:00.000Z",
+  "time": 210.8,
+  "request": {
+    "method": "POST",
+    "url": "https://api.example.com/v1/auth/register",
+    "httpVersion": "HTTP/2.0",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" },
+      { "name": "Accept", "value": "application/json" }
+    ],
+    "postData": {
+      "mimeType": "application/json",
+      "text": "{\"username\":\"lion_dev\",\"password\":\"SuperSecret123!\",\"email\":\"lion@example.com\"}"
+    },
+    "headersSize": 310,
+    "bodySize": 82
+  },
+  "response": {
+    "status": 201,
+    "statusText": "Created",
+    "httpVersion": "HTTP/2.0",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" },
+      { "name": "Set-Cookie", "value": "session=sess_abc123456789; Path=/; HttpOnly; Secure" }
+    ],
+    "content": {
+      "size": 134,
+      "mimeType": "application/json",
+      "text": "{\"id\":\"u_99\",\"username\":\"lion_dev\",\"token\":\"jwt.payload.signature\",\"access_token\":\"at_xyz987\"}"
+    },
+    "headersSize": 220,
+    "bodySize": 134
+  },
+  "timings": {
+    "blocked": 0.8,
+    "dns": 2.1,
+    "connect": 12.0,
+    "send": 1.5,
+    "wait": 182.4,
+    "receive": 12.0,
+    "ssl": 8.0
+  },
+  "_resourceType": "fetch"
+}

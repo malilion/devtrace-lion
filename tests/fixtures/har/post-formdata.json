@@ -1,0 +1,40 @@
+{
+  "startedDateTime": "2026-09-04T12:02:00.000Z",
+  "time": 95.0,
+  "request": {
+    "method": "POST",
+    "url": "https://api.example.com/oauth/token",
+    "httpVersion": "HTTP/1.1",
+    "headers": [
+      { "name": "Content-Type", "value": "application/x-www-form-urlencoded" }
+    ],
+    "postData": {
+      "mimeType": "application/x-www-form-urlencoded",
+      "params": [
+        { "name": "grant_type", "value": "password" },
+        { "name": "client_secret", "value": "top_secret_key" },
+        { "name": "username", "value": "user1" }
+      ]
+    },
+    "headersSize": 210,
+    "bodySize": 68
+  },
+  "response": {
+    "status": 200,
+    "statusText": "OK",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" }
+    ],
+    "content": {
+      "size": 75,
+      "mimeType": "application/json",
+      "text": "{\"token_type\":\"Bearer\",\"access_token\":\"abc123secret\",\"expires_in\":3600}"
+    }
+  },
+  "timings": {
+    "send": 2.0,
+    "wait": 88.0,
+    "receive": 5.0
+  },
+  "_resourceType": "xhr"
+}

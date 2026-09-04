@@ -1,0 +1,33 @@
+{
+  "startedDateTime": "2026-09-04T12:05:00.000Z",
+  "time": 350.0,
+  "request": {
+    "method": "POST",
+    "url": "https://api.example.com/v1/upload/stream",
+    "httpVersion": "HTTP/1.1",
+    "headers": [
+      { "name": "Content-Type", "value": "application/octet-stream" },
+      { "name": "Transfer-Encoding", "value": "chunked" }
+    ],
+    "headersSize": 200,
+    "bodySize": -1
+  },
+  "response": {
+    "status": 200,
+    "statusText": "OK",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" }
+    ],
+    "content": {
+      "size": 32,
+      "mimeType": "application/json",
+      "text": "{\"status\":\"success\",\"bytes\":1048576}"
+    }
+  },
+  "timings": {
+    "send": 200.0,
+    "wait": 140.0,
+    "receive": 10.0
+  },
+  "_resourceType": "fetch"
+}

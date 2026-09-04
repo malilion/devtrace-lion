@@ -1,0 +1,45 @@
+{
+  "startedDateTime": "2026-09-04T12:00:00.000Z",
+  "time": 142.5,
+  "request": {
+    "method": "GET",
+    "url": "https://api.example.com/v1/users?page=1&limit=20",
+    "httpVersion": "HTTP/2.0",
+    "headers": [
+      { "name": "Accept", "value": "application/json" },
+      { "name": "User-Agent", "value": "Mozilla/5.0" }
+    ],
+    "queryString": [
+      { "name": "page", "value": "1" },
+      { "name": "limit", "value": "20" }
+    ],
+    "headersSize": 250,
+    "bodySize": 0
+  },
+  "response": {
+    "status": 200,
+    "statusText": "OK",
+    "httpVersion": "HTTP/2.0",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json; charset=utf-8" },
+      { "name": "Cache-Control", "value": "max-age=3600" }
+    ],
+    "content": {
+      "size": 185,
+      "mimeType": "application/json",
+      "text": "{\"users\":[{\"id\":1,\"name\":\"Alice\"},{\"id\":2,\"name\":\"Bob\"}],\"total\":2}"
+    },
+    "headersSize": 180,
+    "bodySize": 185
+  },
+  "timings": {
+    "blocked": 1.2,
+    "dns": 15.0,
+    "connect": 25.4,
+    "send": 2.1,
+    "wait": 85.3,
+    "receive": 13.5,
+    "ssl": 18.2
+  },
+  "_resourceType": "fetch"
+}

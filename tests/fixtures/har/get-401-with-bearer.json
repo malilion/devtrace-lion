@@ -1,0 +1,36 @@
+{
+  "startedDateTime": "2026-09-04T12:03:00.000Z",
+  "time": 88.6,
+  "request": {
+    "method": "GET",
+    "url": "https://api.example.com/v1/profile/me",
+    "httpVersion": "HTTP/2.0",
+    "headers": [
+      { "name": "Authorization", "value": "Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.sensitive_payload" },
+      { "name": "Accept", "value": "application/json" }
+    ],
+    "headersSize": 280,
+    "bodySize": 0
+  },
+  "response": {
+    "status": 401,
+    "statusText": "Unauthorized",
+    "headers": [
+      { "name": "Content-Type", "value": "application/json" },
+      { "name": "WWW-Authenticate", "value": "Bearer error=\"invalid_token\", error_description=\"The token has expired\"" }
+    ],
+    "content": {
+      "size": 48,
+      "mimeType": "application/json",
+      "text": "{\"error\":\"unauthorized\",\"message\":\"Token expired\"}"
+    },
+    "headersSize": 210,
+    "bodySize": 48
+  },
+  "timings": {
+    "send": 1.0,
+    "wait": 82.0,
+    "receive": 5.6
+  },
+  "_resourceType": "fetch"
+}
