@@ -6,6 +6,7 @@
   "type": "module",
   "author": "malilion",
   "license": "MIT",
+  "packageManager": "pnpm@11.21.0",
   "repository": {
     "type": "git",
     "url": "https://github.com/malilion/devtrace-lion.git"
