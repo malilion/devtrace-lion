@@ -92,7 +92,7 @@
           <div class="grid grid-cols-2 gap-2 text-xs">
             <div>
               <span class="text-gray-400">Request URL:</span>
-              <div class="font-mono break-all font-medium text-devtools-text-light dark:text-devtools-text-dark select-text">{{ record.url }}</div>
+              <div class="font-mono break-all font-medium text-devtools-text-light dark:text-devtools-text-dark select-text">{{ displayedUrl }}</div>
             </div>
             <div>
               <span class="text-gray-400">Request Method:</span>
@@ -133,14 +133,19 @@
         </div>
 
         <!-- Query Parameters -->
-        <div v-if="Object.keys(record.query).length > 0" class="border border-devtools-border-light dark:border-devtools-border-dark rounded overflow-hidden">
+        <div v-if="Object.keys(displayedQuery).length > 0" class="border border-devtools-border-light dark:border-devtools-border-dark rounded overflow-hidden">
           <div class="px-3 py-1.5 bg-gray-50 dark:bg-devtools-panel-dark font-semibold text-gray-500 uppercase tracking-wider text-[11px] border-b border-devtools-border-light dark:border-devtools-border-dark">
-            Query Parameters ({{ Object.keys(record.query).length }})
+            Query Parameters ({{ Object.keys(displayedQuery).length }})
           </div>
           <div class="divide-y divide-devtools-border-light dark:divide-devtools-border-dark font-mono text-xs">
-            <div v-for="(val, key) in record.query" :key="key" class="grid grid-cols-3 p-2 hover:bg-black/5 dark:hover:bg-white/5">
+            <div v-for="(val, key) in displayedQuery" :key="key" class="grid grid-cols-3 p-2 hover:bg-black/5 dark:hover:bg-white/5">
               <span class="text-blue-600 dark:text-blue-400 font-medium select-text">{{ key }}:</span>
-              <span class="col-span-2 text-gray-700 dark:text-gray-300 break-all select-text">{{ val }}</span>
+              <span
+                class="col-span-2 text-gray-700 dark:text-gray-300 break-all select-text"
+                :class="{ 'text-amber-600 dark:text-amber-400 font-bold': val.includes('•••••••••••') }"
+              >
+                {{ val }}
+              </span>
             </div>
           </div>
         </div>
@@ -341,6 +346,20 @@ const displayedResponseBodyText = computed(() => {
     return rawUnredacted.value.responseBodyText;
   }
   return props.record.responseBody?.text;
+});
+
+const displayedUrl = computed(() => {
+  if (isRevealed.value && rawUnredacted.value?.url) {
+    return rawUnredacted.value.url;
+  }
+  return props.record.url;
+});
+
+const displayedQuery = computed(() => {
+  if (isRevealed.value && rawUnredacted.value?.query) {
+    return rawUnredacted.value.query;
+  }
+  return props.record.query;
 });
 
 const insight = computed(() => getStatusInsight(props.record));

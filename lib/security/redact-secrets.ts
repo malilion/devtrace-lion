@@ -149,20 +149,24 @@ export function redactBodyText(
   return { text, foundKeys };
 }
 
+export interface RawUnredactedData {
+  requestHeaders: Record<string, string>;
+  responseHeaders: Record<string, string>;
+  requestBodyText?: string;
+  responseBodyText?: string;
+  url: string;
+  query: Record<string, string>;
+}
+
 export interface RedactResult {
   record: NetworkRecord;
   /** Preserved raw copy for "Reveal locally" in-memory view ONLY. Never exposed to copy/export */
-  rawUnredacted?: {
-    requestHeaders: Record<string, string>;
-    responseHeaders: Record<string, string>;
-    requestBodyText?: string;
-    responseBodyText?: string;
-  };
+  rawUnredacted?: RawUnredactedData;
 }
 
 /**
  * Sanitizes a NetworkRecord before it enters the store.
- * Redacts request headers, response headers, request body, and response body.
+ * Redacts query params, request headers, response headers, request body, and response body.
  */
 export function redactSecrets(
   record: NetworkRecord,
@@ -171,12 +175,41 @@ export function redactSecrets(
   const redactedKeys = new Set<string>();
 
   // Store raw copies in separate isolated structure
-  const rawUnredacted = {
+  const rawUnredacted: RawUnredactedData = {
     requestHeaders: { ...record.requestHeaders },
     responseHeaders: { ...record.responseHeaders },
     requestBodyText: record.requestBody?.text,
     responseBodyText: record.responseBody?.text,
+    url: record.url,
+    query: { ...record.query },
   };
+
+  // Redact Query Parameters and URL
+  let cleanUrl = record.url;
+  const cleanQuery: Record<string, string> = {};
+  let queryModified = false;
+
+  for (const [param, val] of Object.entries(record.query)) {
+    if (isSecretKey(param, customKeys)) {
+      cleanQuery[param] = MASK_VALUE;
+      redactedKeys.add(param);
+      queryModified = true;
+    } else {
+      cleanQuery[param] = val;
+    }
+  }
+
+  if (queryModified) {
+    try {
+      const u = new URL(record.url);
+      for (const [k, v] of Object.entries(cleanQuery)) {
+        u.searchParams.set(k, v);
+      }
+      cleanUrl = u.toString();
+    } catch {
+      // Keep original url if parsing fails
+    }
+  }
 
   // Redact Request Headers
   const cleanRequestHeaders: Record<string, string> = {};
@@ -218,6 +251,8 @@ export function redactSecrets(
 
   const redactedRecord: NetworkRecord = {
     ...record,
+    url: cleanUrl,
+    query: cleanQuery,
     requestHeaders: cleanRequestHeaders,
     responseHeaders: cleanResponseHeaders,
     requestBody: cleanRequestBody,

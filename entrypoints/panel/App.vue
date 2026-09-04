@@ -101,7 +101,9 @@
       <section
         :class="[
           'h-full flex flex-col min-w-0 transition-all duration-150',
-          networkStore.selectedRecord ? 'w-full md:w-1/2 lg:w-5/12 border-r border-devtools-border-light dark:border-devtools-border-dark' : 'w-full'
+          networkStore.selectedRecord
+            ? 'hidden md:flex md:w-1/2 lg:w-5/12 border-r border-devtools-border-light dark:border-devtools-border-dark'
+            : 'w-full'
         ]"
       >
         <RequestTable @open-diff="showDiffModal = true" />
@@ -110,7 +112,7 @@
       <!-- Right: Request Detail Panel -->
       <section
         v-if="networkStore.selectedRecord"
-        class="h-full hidden md:flex flex-col flex-1 min-w-0"
+        class="h-full flex flex-col flex-1 min-w-0"
       >
         <RequestDetail :record="networkStore.selectedRecord" />
       </section>

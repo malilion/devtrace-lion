@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { FilterState, NetworkRecord } from '@/types/network';
-import type { RedactResult } from '@/lib/security/redact-secrets';
+import type { RedactResult, RawUnredactedData } from '@/lib/security/redact-secrets';
 import { normalizeRequest } from '@/lib/network/normalize-request';
 import { redactSecrets } from '@/lib/security/redact-secrets';
 
@@ -21,12 +21,7 @@ export const useNetworkStore = defineStore('network', () => {
 
   // Isolated raw secrets stored in memory, keyed by record ID.
   // NEVER accessed during copy, export, or codegen.
-  const rawStore = new Map<string, {
-    requestHeaders: Record<string, string>;
-    responseHeaders: Record<string, string>;
-    requestBodyText?: string;
-    responseBodyText?: string;
-  }>();
+  const rawStore = new Map<string, RawUnredactedData>();
 
   // Currently selected record for detail panel
   const selectedId = ref<string | null>(null);
