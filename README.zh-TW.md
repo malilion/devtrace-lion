@@ -269,7 +269,7 @@ pnpm install
 # 嚴格 TypeScript 型別檢查
 pnpm typecheck
 
-# 執行單元與元件測試 (53 項測試)
+# 執行單元與元件測試 (54 項測試)
 pnpm test
 
 # 執行 ESLint 語法檢查

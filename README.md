@@ -434,7 +434,7 @@ pnpm install
 # Run strict type checking
 pnpm typecheck
 
-# Run unit and component test suite (53 tests)
+# Run unit and component test suite (54 tests)
 pnpm test
 
 # Run code linter
