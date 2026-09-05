@@ -159,7 +159,7 @@
             <span class="font-semibold text-gray-500 uppercase tracking-wider text-[11px]">
               Request Headers ({{ Object.keys(displayedRequestHeaders).length }})
             </span>
-            <BaseButton size="xs" variant="ghost" @click="copyHeaders(displayedRequestHeaders)">
+            <BaseButton size="xs" variant="ghost" @click="copyHeaders(record.requestHeaders)">
               {{ headersCopied ? '✓ Copied' : 'Copy' }}
             </BaseButton>
           </div>
@@ -186,7 +186,7 @@
             <span class="font-semibold text-gray-500 uppercase tracking-wider text-[11px]">
               Response Headers ({{ Object.keys(displayedResponseHeaders).length }})
             </span>
-            <BaseButton size="xs" variant="ghost" @click="copyHeaders(displayedResponseHeaders)">
+            <BaseButton size="xs" variant="ghost" @click="copyHeaders(record.responseHeaders)">
               Copy
             </BaseButton>
           </div>
@@ -220,7 +220,7 @@
           </p>
         </div>
         <div v-else>
-          <JsonViewer :content="displayedRequestBodyText" label="Request Payload" />
+          <JsonViewer :content="displayedRequestBodyText" :copy-content="record.requestBody?.text" label="Request Payload" />
         </div>
       </div>
 
@@ -244,7 +244,7 @@
 
         <!-- Response Body Content -->
         <div v-else>
-          <JsonViewer :content="displayedResponseBodyText" label="Response Body" />
+          <JsonViewer :content="displayedResponseBodyText" :copy-content="record.responseBody?.text" label="Response Body" />
         </div>
       </div>
 
@@ -422,6 +422,9 @@ async function handleCopyCurl() {
 }
 
 async function copyHeaders(headers: Record<string, string>) {
+  // SECURITY: callers MUST pass the redacted `record.*Headers`, never the
+  // `displayed*Headers` computeds (which expose raw secrets when "Reveal
+  // Locally" is active). Copy/export must remain strictly redacted.
   const text = Object.entries(headers)
     .map(([k, v]) => `${k}: ${v}`)
     .join('\n');

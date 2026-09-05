@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/malilion/devtrace-lion/actions/workflows/ci.yml">
-    <img src="https://github.com/malilion/devtrace-lion/actions/workflows/ci.yml/badge.svg" alt="CI Status" />
+  <a href="https://github.com/malilion/DevTraceLion/actions/workflows/ci.yml">
+    <img src="https://github.com/malilion/DevTraceLion/actions/workflows/ci.yml/badge.svg" alt="CI Status" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT" />
@@ -141,7 +141,7 @@ When debugging web applications, developers open browser DevTools every single d
 ### Step 1: Clone and Build
 ```bash
 # Clone repository
-git clone https://github.com/malilion/devtrace-lion.git
+git clone https://github.com/malilion/DevTraceLion.git
 cd devtrace-lion
 
 # Install dependencies

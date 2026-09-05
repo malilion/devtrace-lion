@@ -9,12 +9,12 @@
   "packageManager": "pnpm@11.21.0",
   "repository": {
     "type": "git",
-    "url": "https://github.com/malilion/devtrace-lion.git"
+    "url": "https://github.com/malilion/DevTraceLion.git"
   },
   "bugs": {
-    "url": "https://github.com/malilion/devtrace-lion/issues"
+    "url": "https://github.com/malilion/DevTraceLion/issues"
   },
-  "homepage": "https://github.com/malilion/devtrace-lion#readme",
+  "homepage": "https://github.com/malilion/DevTraceLion#readme",
   "scripts": {
     "dev": "wxt",
     "dev:firefox": "wxt -b firefox",

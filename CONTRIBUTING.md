@@ -8,7 +8,7 @@ Thank you for your interest in contributing to DevTrace Lion! We welcome contrib
 
 1. **Fork and Clone**:
    ```bash
-   git clone https://github.com/malilion/devtrace-lion.git
+   git clone https://github.com/malilion/DevTraceLion.git
    cd devtrace-lion
    ```
 

@@ -32,6 +32,13 @@ import { ref, computed } from 'vue';
 const props = defineProps<{
   content?: string;
   label?: string;
+  /**
+   * The text placed on the clipboard when the user clicks "Copy".
+   * SECURITY: this must ALWAYS be the redacted value. `content` may show
+   * locally-revealed raw secrets on screen, but copy must never leak them.
+   * Falls back to `content` only when not provided (non-sensitive views).
+   */
+  copyContent?: string;
 }>();
 
 const copied = ref(false);
@@ -82,9 +89,12 @@ const highlightedContent = computed(() => {
 });
 
 async function handleCopy() {
-  if (!props.content) return;
+  // SECURITY: never copy the on-screen (possibly revealed) content.
+  // Prefer the explicit redacted copyContent; fall back to content.
+  const textToCopy = props.copyContent ?? props.content;
+  if (!textToCopy) return;
   try {
-    await navigator.clipboard.writeText(props.content);
+    await navigator.clipboard.writeText(textToCopy);
     copied.value = true;
     setTimeout(() => {
       copied.value = false;
@@ -92,7 +102,7 @@ async function handleCopy() {
   } catch {
     // Fallback if clipboard API not accessible
     const textarea = document.createElement('textarea');
-    textarea.value = props.content;
+    textarea.value = textToCopy;
     document.body.appendChild(textarea);
     textarea.select();
     document.execCommand('copy');

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { redactSecrets, isSecretKey, MASK_VALUE } from '@/lib/security/redact-secrets';
+import { redactSecrets, isSecretKey, MASK_VALUE, redactHeaderValue, redactBodyText, looksLikeSecretValue } from '@/lib/security/redact-secrets';
 import { normalizeRequest } from '@/lib/network/normalize-request';
 import get401Fixture from '../fixtures/har/get-401-with-bearer.json';
 import post201Fixture from '../fixtures/har/post-json-201.json';
@@ -128,3 +128,79 @@ describe('redactSecrets', () => {
   });
 });
 
+describe('redactSecrets — medium-risk hardening', () => {
+  // #2: multi-value (comma-joined) secret headers must be fully masked per segment
+  it('masks every segment of a comma-joined secret header', () => {
+    const out = redactHeaderValue('set-cookie', 'sid=abc123, token=def456');
+    expect(out).not.toContain('abc123');
+    expect(out).not.toContain('def456');
+    // Two segments preserved as two masked values
+    expect(out.split(',').length).toBe(2);
+    expect(out).toContain(MASK_VALUE);
+  });
+
+  it('masks a comma-joined Bearer/Token header keeping scheme prefixes', () => {
+    const out = redactHeaderValue('authorization', 'Bearer aaaaaaaa, Token bbbbbbbb');
+    expect(out).toContain(`Bearer ${MASK_VALUE}`);
+    expect(out).toContain(`Token ${MASK_VALUE}`);
+    expect(out).not.toContain('aaaaaaaa');
+    expect(out).not.toContain('bbbbbbbb');
+  });
+
+  // #3: form redaction is robust and not gated on a fragile "modified" flag
+  it('redacts secret keys in urlencoded form regardless of ordering', () => {
+    const { text, foundKeys } = redactBodyText('username=bob&password=hunter2&remember=1');
+    expect(text).toContain(`password=${encodeURIComponent(MASK_VALUE)}`);
+    expect(text).toContain('username=bob');
+    expect(text).toContain('remember=1');
+    expect(text).not.toContain('hunter2');
+    expect(foundKeys.has('password')).toBe(true);
+  });
+
+  it('returns form data unchanged (but round-tripped) when nothing is secret', () => {
+    const { text, foundKeys } = redactBodyText('a=1&b=2');
+    // No secrets found
+    expect(Array.from(foundKeys).filter((k) => k !== '(embedded token)')).toHaveLength(0);
+    // Values preserved
+    const parsed = new URLSearchParams(text);
+    expect(parsed.get('a')).toBe('1');
+    expect(parsed.get('b')).toBe('2');
+  });
+
+  // #4: value-based detection — secrets under innocuous keys
+  it('detects secret-shaped values by pattern', () => {
+    expect(looksLikeSecretValue('eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiIxIn0.abcDEF123_-')).toBe(true);
+    expect(looksLikeSecretValue('sk_live_abcdefgh12345678')).toBe(true);
+    expect(looksLikeSecretValue('ghp_0123456789abcdefghijklmnopqrstuvwx')).toBe(true);
+    expect(looksLikeSecretValue('hello world')).toBe(false);
+    expect(looksLikeSecretValue('u_99')).toBe(false);
+  });
+
+  it('masks a JWT stored under an innocuous JSON key', () => {
+    const jwt = 'eyJhbGciOiJIUzI1NiJ9.eyJzdWIiOiJhZG1pbiJ9.s3cr3t_Signature_val';
+    const body = JSON.stringify({ note: 'ok', data: jwt, count: 3 });
+    const { text } = redactBodyText(body);
+    expect(text).toBeDefined();
+    const parsed = JSON.parse(text as string);
+    expect(parsed.data).not.toContain('s3cr3t_Signature_val');
+    expect(parsed.data).toContain(MASK_VALUE);
+    // Non-secret siblings untouched
+    expect(parsed.note).toBe('ok');
+    expect(parsed.count).toBe(3);
+  });
+
+  it('masks a provider key embedded in a free-form (non-JSON, non-form) body', () => {
+    const body = 'Debug log: calling API with key sk_live_ABCDEFGH12345678 done.';
+    const { text, foundKeys } = redactBodyText(body);
+    expect(text).not.toContain('sk_live_ABCDEFGH12345678');
+    expect(text).toContain(MASK_VALUE);
+    expect(foundKeys.has('(embedded token)')).toBe(true);
+  });
+
+  it('leaves ordinary free-form text unchanged', () => {
+    const body = 'This is just a plain log line with no credentials.';
+    const { text, foundKeys } = redactBodyText(body);
+    expect(text).toBe(body);
+    expect(foundKeys.size).toBe(0);
+  });
+});

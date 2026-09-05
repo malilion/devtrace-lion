@@ -25,6 +25,54 @@ export const DEFAULT_SECRET_KEYS: string[] = [
 export const MASK_VALUE = '•••••••••••';
 
 /**
+ * High-confidence patterns for secrets that appear as VALUES (not keys).
+ * Conservative by design: only masks values that are almost certainly
+ * credentials, to avoid corrupting legitimate data. This complements the
+ * key-based redaction — e.g. `{"data": "<JWT>"}` where the key is innocuous.
+ */
+const VALUE_SECRET_PATTERNS: RegExp[] = [
+  // JWT: three base64url segments separated by dots
+  /\beyJ[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\.[A-Za-z0-9_-]{5,}\b/,
+  // Bearer/Basic/Token scheme followed by a credential
+  /\b(?:Bearer|Basic|Token)\s+[A-Za-z0-9._~+/=-]{8,}/i,
+  // Common provider key prefixes (Stripe, GitHub, OpenAI, Google, Slack, AWS)
+  /\b(?:sk|pk|rk)_(?:live|test)_[A-Za-z0-9]{8,}\b/,
+  /\bgh[pousr]_[A-Za-z0-9]{20,}\b/,
+  /\bsk-[A-Za-z0-9]{20,}\b/,
+  /\bAIza[0-9A-Za-z_-]{20,}\b/,
+  /\bxox[baprs]-[A-Za-z0-9-]{10,}\b/,
+  /\bAKIA[0-9A-Z]{12,}\b/,
+];
+
+/**
+ * Returns true if a string value looks like a credential by shape alone.
+ */
+export function looksLikeSecretValue(value: string): boolean {
+  if (typeof value !== 'string' || value.length < 8) return false;
+  return VALUE_SECRET_PATTERNS.some((re) => re.test(value));
+}
+
+/**
+ * Masks any secret-shaped substrings inside a free-form string, preserving
+ * the surrounding non-sensitive text. Returns the original string if nothing
+ * matched.
+ */
+export function maskSecretsInText(value: string): { text: string; matched: boolean } {
+  if (typeof value !== 'string' || !value) return { text: value, matched: false };
+  let matched = false;
+  let out = value;
+  for (const re of VALUE_SECRET_PATTERNS) {
+    out = out.replace(new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g'), (m) => {
+      matched = true;
+      // Preserve a leading scheme word (Bearer/Basic/Token) if present.
+      const scheme = m.match(/^(Bearer|Basic|Token)\s+/i);
+      return scheme ? `${scheme[0]}${MASK_VALUE}` : MASK_VALUE;
+    });
+  }
+  return { text: out, matched };
+}
+
+/**
  * Checks if a key matches any pattern in the secrets list (case-insensitive).
  */
 export function isSecretKey(key: string, customKeys: string[] = []): boolean {
@@ -39,6 +87,13 @@ export function isSecretKey(key: string, customKeys: string[] = []): boolean {
  */
 export function redactHeaderValue(_key: string, value: string): string {
   if (!value) return value;
+  // A secret header may carry multiple comma-joined values (the normalizer
+  // merges duplicate headers, e.g. multiple Set-Cookie). Mask EACH segment so
+  // no part can leak, while keeping the value count intact.
+  const segments = value.split(/,\s*/);
+  if (segments.length > 1) {
+    return segments.map((seg) => redactHeaderValue(_key, seg)).join(', ');
+  }
   const match = value.match(/^((?:Bearer|Basic|Digest|Token)\s+)(.+)$/i);
   if (match) {
     return `${match[1]}${MASK_VALUE}`;
@@ -76,6 +131,12 @@ export function redactJsonValue(
         } else {
           output[k] = MASK_VALUE;
         }
+      } else if (typeof v === 'string' && looksLikeSecretValue(v)) {
+        // Defense-in-depth: the key is innocuous but the VALUE is a credential
+        // by shape (JWT, provider key, etc.). Mask the secret-shaped part.
+        const { text: maskedVal } = maskSecretsInText(v);
+        output[k] = maskedVal;
+        foundKeys.add(k);
       } else {
         output[k] = walk(v);
       }
@@ -119,23 +180,29 @@ export function redactBodyText(
     }
   }
 
-  // Try Form URL-Encoded (e.g. grant_type=password&client_secret=123)
+  // Try Form URL-Encoded (e.g. grant_type=password&client_secret=xyz)
   if (trimmed.includes('=') && !trimmed.includes('\n')) {
     try {
       const params = new URLSearchParams(text);
-      let hasFormParam = false;
-      let modified = false;
+      const entries = Array.from(params.entries());
+      const hasFormParam = entries.length > 0;
 
-      for (const [key] of Array.from(params.entries())) {
-        hasFormParam = true;
-        if (isSecretKey(key, customKeys)) {
-          params.set(key, MASK_VALUE);
-          foundKeys.add(key);
-          modified = true;
+      if (hasFormParam) {
+        for (const [key, val] of entries) {
+          if (isSecretKey(key, customKeys)) {
+            // Secret by key name.
+            params.set(key, MASK_VALUE);
+            foundKeys.add(key);
+          } else if (looksLikeSecretValue(val)) {
+            // Defense-in-depth: secret by value shape under an innocuous key.
+            const { text: maskedVal } = maskSecretsInText(val);
+            params.set(key, maskedVal);
+            foundKeys.add(key);
+          }
         }
-      }
-
-      if (hasFormParam && modified) {
+        // Always return the parsed+reserialized form when it IS form data.
+        // Not gated on a fragile "modified" flag: if nothing was secret the
+        // output is equivalent, and the path stays robust to future edits.
         return {
           text: params.toString(),
           foundKeys,
@@ -144,6 +211,16 @@ export function redactBodyText(
     } catch {
       // Ignore
     }
+  }
+
+  // Fallback: free-form text (logs, XML, plain bodies). Mask any secret-shaped
+  // substrings so credentials embedded in non-JSON/non-form bodies don't leak.
+  const { text: maskedText, matched } = maskSecretsInText(text);
+  if (matched) {
+    // Surface a friendly marker in the protected-fields list without inventing
+    // a fake header/JSON key name.
+    foundKeys.add('(embedded token)');
+    return { text: maskedText, foundKeys };
   }
 
   return { text, foundKeys };

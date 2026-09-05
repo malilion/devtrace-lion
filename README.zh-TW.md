@@ -13,8 +13,8 @@
 </p>
 
 <p align="center">
-  <a href="https://github.com/malilion/devtrace-lion/actions/workflows/ci.yml">
-    <img src="https://github.com/malilion/devtrace-lion/actions/workflows/ci.yml/badge.svg" alt="CI 狀態" />
+  <a href="https://github.com/malilion/DevTraceLion/actions/workflows/ci.yml">
+    <img src="https://github.com/malilion/DevTraceLion/actions/workflows/ci.yml/badge.svg" alt="CI 狀態" />
   </a>
   <a href="LICENSE">
     <img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="授權條款: MIT" />
@@ -141,7 +141,7 @@
 ### 步驟 1：取得專案並編譯
 ```bash
 # 複製倉庫
-git clone https://github.com/malilion/devtrace-lion.git
+git clone https://github.com/malilion/DevTraceLion.git
 cd devtrace-lion
 
 # 安裝依賴 (使用 pnpm)
